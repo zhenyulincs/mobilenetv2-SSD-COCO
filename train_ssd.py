@@ -244,7 +244,7 @@ if __name__ == '__main__':
             num_classes = len(dataset.class_names)
         elif args.dataset_type == "coco":
             # label_file = "D:\MachineLearning\pytorch\pytorch-ssd\data\COCO\ms_coco_classnames.txt"
-            dataset = COCODataSet("/home/ec2-user/SageMaker/Zhenyu Lin/COCO/anns/train/train2017", "/home/ec2-user/SageMaker/Zhenyu Lin/COCO/anns/annotations/instances_train2017.json",transform=train_transform,
+            dataset = COCODataSet("/home/ec2-user/SageMaker/Zhenyu Lin/COCO/train/train2017", "/home/ec2-user/SageMaker/Zhenyu Lin/COCO/anns/annotations/instances_train2017.json",transform=train_transform,
                                  target_transform=target_transform)
             num_classes = 91
         else:
@@ -273,7 +273,7 @@ if __name__ == '__main__':
                                         dataset_type="test")
         logging.info(val_dataset)
     elif args.dataset_type == "coco":
-        val_dataset = COCODataSet("/home/ec2-user/SageMaker/Zhenyu Lin/COCO/anns/val/val2017", "/home/ec2-user/SageMaker/Zhenyu Lin/COCO/anns/annotations/instances_val2017.json",transform=test_transform,
+        val_dataset = COCODataSet("/home/ec2-user/SageMaker/Zhenyu Lin/COCO/val/val2017", "/home/ec2-user/SageMaker/Zhenyu Lin/COCO/anns/annotations/instances_val2017.json",transform=test_transform,
                                  target_transform=target_transform)
         
     logging.info("Validation dataset size: {}".format(len(val_dataset)))
