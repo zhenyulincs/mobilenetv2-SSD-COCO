@@ -255,11 +255,11 @@ if __name__ == '__main__':
     # logging.info(f"Stored labels into file {label_file}.")
     train_dataset = ConcatDataset(datasets)
     logging.info("Train dataset size: {}".format(len(train_dataset)))
-    # train_loader = DataLoader(train_dataset, args.batch_size,
-    #                           num_workers=args.num_workers,
-    #                           shuffle=True)
     train_loader = DataLoader(train_dataset, args.batch_size,
+                              num_workers=args.num_workers,
                               shuffle=True)
+    # train_loader = DataLoader(train_dataset, args.batch_size,
+    #                           shuffle=True)
                               
                            
     # create validation dataset                           
@@ -278,11 +278,11 @@ if __name__ == '__main__':
         
     logging.info("Validation dataset size: {}".format(len(val_dataset)))
 
-    # val_loader = DataLoader(val_dataset, args.batch_size,
-    #                         num_workers=args.num_workers,
-    #                         shuffle=False)
     val_loader = DataLoader(val_dataset, args.batch_size,
+                            num_workers=args.num_workers,
                             shuffle=False)
+    # val_loader = DataLoader(val_dataset, args.batch_size,
+    #                         shuffle=False)
                             
     # create the network
     logging.info("Build network.")
