@@ -384,10 +384,10 @@ if __name__ == '__main__':
             num_classes = len(dataset.class_names)
         elif args.dataset_type == "coco":
             # label_file = "D:\MachineLearning\pytorch\pytorch-ssd\data\COCO\ms_coco_classnames.txt"
-            # dataset = COCODataSet("/home/ec2-user/SageMaker/Zhenyu Lin/COCO/train/train2017", "/home/ec2-user/SageMaker/Zhenyu Lin/COCO/anns/annotations/instances_train2017.json",transform=train_transform,
-            #                      target_transform=target_transform)
-            dataset = COCODataSet("D:\MachineLearning\pytorch\pytorch-ssd\data\COCO\\train", "D:\MachineLearning\pytorch\pytorch-ssd\data\COCO\\annotations\instances_train2017.json",transform=train_transform,
+            dataset = COCODataSet("/home/ec2-user/SageMaker/Zhenyu Lin/COCO/train/train2017", "/home/ec2-user/SageMaker/Zhenyu Lin/COCO/anns/annotations/instances_train2017.json",transform=train_transform,
                                  target_transform=target_transform)
+            # dataset = COCODataSet("D:\MachineLearning\pytorch\pytorch-ssd\data\COCO\\train", "D:\MachineLearning\pytorch\pytorch-ssd\data\COCO\\annotations\instances_train2017.json",transform=train_transform,
+            #                      target_transform=target_transform)
             num_classes = 91
         else:
             raise ValueError(f"Dataset type {args.dataset_type} is not supported.")
@@ -397,11 +397,11 @@ if __name__ == '__main__':
     # logging.info(f"Stored labels into file {label_file}.")
     train_dataset = ConcatDataset(datasets)
     logging.info("Train dataset size: {}".format(len(train_dataset)))
-    # train_loader = DataLoader(train_dataset, args.batch_size,
-    #                           num_workers=args.num_workers,
-    #                           shuffle=True)
     train_loader = DataLoader(train_dataset, args.batch_size,
+                              num_workers=args.num_workers,
                               shuffle=True)
+    # train_loader = DataLoader(train_dataset, args.batch_size,
+    #                           shuffle=True)
                               
                            
     # create validation dataset                           
@@ -415,18 +415,18 @@ if __name__ == '__main__':
                                         dataset_type="test")
         logging.info(val_dataset)
     elif args.dataset_type == "coco":
-        # val_dataset = COCODataSet("/home/ec2-user/SageMaker/Zhenyu Lin/COCO/val/val2017", "/home/ec2-user/SageMaker/Zhenyu Lin/COCO/anns/annotations/instances_val2017.json",transform=test_transform,
-        #                          target_transform=target_transform)
-        val_dataset = COCODataSet("D:\MachineLearning\pytorch\pytorch-ssd\data\COCO\\val", "D:\MachineLearning\pytorch\pytorch-ssd\data\COCO\\annotations\instances_val2017.json",transform=test_transform,
+        val_dataset = COCODataSet("/home/ec2-user/SageMaker/Zhenyu Lin/COCO/val/val2017", "/home/ec2-user/SageMaker/Zhenyu Lin/COCO/anns/annotations/instances_val2017.json",transform=test_transform,
                                  target_transform=target_transform)
+        # val_dataset = COCODataSet("D:\MachineLearning\pytorch\pytorch-ssd\data\COCO\\val", "D:\MachineLearning\pytorch\pytorch-ssd\data\COCO\\annotations\instances_val2017.json",transform=test_transform,
+        #                          target_transform=target_transform)
         
     logging.info("Validation dataset size: {}".format(len(val_dataset)))
 
-    # val_loader = DataLoader(val_dataset, args.batch_size,
-    #                         num_workers=args.num_workers,
-    #                         shuffle=False)
     val_loader = DataLoader(val_dataset, args.batch_size,
+                            num_workers=args.num_workers,
                             shuffle=False)
+    # val_loader = DataLoader(val_dataset, args.batch_size,
+    #                         shuffle=False)
                             
     # create the network
     logging.info("Build network.")
