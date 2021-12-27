@@ -44,7 +44,7 @@ class OpenImagesDataset:
 
     def __getitem__(self, index):
         _, image, boxes, labels = self._getitem(index)
-        return image, boxes, labels
+        return image, boxes, labels,_
 
     def get_annotation(self, index):
         """To conform the eval_ssd implementation that is based on the VOC dataset."""

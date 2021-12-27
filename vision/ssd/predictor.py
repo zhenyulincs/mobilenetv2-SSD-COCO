@@ -20,7 +20,7 @@ class Predictor:
             self.device = device
         else:
             self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
+        
         self.net.to(self.device)
         self.net.eval()
 
@@ -29,6 +29,7 @@ class Predictor:
     def predict(self, image, top_k=-1, prob_threshold=None):
         cpu_device = torch.device("cpu")
         height, width, _ = image.shape
+        
         image = self.transform(image)
         #print(image)
         images = image.unsqueeze(0)
@@ -37,6 +38,7 @@ class Predictor:
             self.timer.start()
             scores, boxes = self.net.forward(images)
             print("Inference time: ", self.timer.end())
+        
         boxes = boxes[0]
         scores = scores[0]
         if not prob_threshold:
@@ -44,22 +46,28 @@ class Predictor:
         # this version of nms is slower on GPU, so we move data to CPU.
         boxes = boxes.to(cpu_device)
         scores = scores.to(cpu_device)
+        
         picked_box_probs = []
         picked_labels = []
+
         for class_index in range(1, scores.size(1)):
             probs = scores[:, class_index]
             mask = probs > prob_threshold
+            
             probs = probs[mask]
+            
             if probs.size(0) == 0:
                 continue
             subset_boxes = boxes[mask, :]
             box_probs = torch.cat([subset_boxes, probs.reshape(-1, 1)], dim=1)
+            
             box_probs = box_utils.nms(box_probs, self.nms_method,
                                       score_threshold=prob_threshold,
                                       iou_threshold=self.iou_threshold,
                                       sigma=self.sigma,
                                       top_k=top_k,
                                       candidate_size=self.candidate_size)
+ 
             picked_box_probs.append(box_probs)
             picked_labels.extend([class_index] * box_probs.size(0))
         if not picked_box_probs:

@@ -24,7 +24,7 @@ class COCODataSet:
         self.transform = transform
         self.target_transform = target_transform
         self.ids_image = sorted(self.coco.getImgIds())
-        self.ids_ann = sorted(self.coco.getAnnIds())
+        # self.ids_ann = self.coco.getAnnIds()
         self.ids = self.ids_image
         self.root = root;
         self.class_names = (
@@ -120,7 +120,12 @@ class COCODataSet:
         boxes = []
         labels = []
         # for x in range(len(self.ids_ann)):
-        anns = self.coco.loadAnns(self.ids_ann[image_id])[0]
+        
+        # anns = self.coco.loadAnns(self.ids_ann[image_id])[0]
+        if (len(self.coco.getAnnIds(image_id)) == 0):
+            image_id = self.ids[idx+1]
+        anns = self.coco.loadAnns(self.coco.getAnnIds(image_id))[0]
+
         tempBox = anns["bbox"]
         
 
@@ -146,7 +151,7 @@ class COCODataSet:
         else:
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        boxes = np.array(boxes)
+        boxes = np.array(boxes,dtype="float32")
         labels = np.array(labels,dtype='int64')
         
         if self.transform:
@@ -159,4 +164,5 @@ class COCODataSet:
         # tempTarget["labels"] = labels
         # target = [tempTarget]
         # return image, target
+        imagePath = str(os.path.join(self.root, path))
         return image, boxes, labels

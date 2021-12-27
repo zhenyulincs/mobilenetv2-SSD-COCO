@@ -123,20 +123,160 @@ def train(loader, net, criterion, optimizer, device, debug_steps=100, epoch=-1):
     # lr_scheduler.step()
     ## evaluate on the test dataset
     # evaluate(net, loader, device=device)
+    # import cv2
+    # import torchvision
+    # from vision.utils import box_utils
 
     net.train(True)
+    # net.eval()    
+
     running_loss = 0.0
     running_regression_loss = 0.0
     running_classification_loss = 0.0
+    # class_names = (
+    #         "BACKGROUND",
+    #         'person',
+    #         'bicycle',
+    #         'car',
+    #         'motorcycle',
+    #         'airplane',
+    #         'bus',
+    #         'train',
+    #         'truck',
+    #         'boat',
+    #         'traffic light',
+    #         'fire hydrant',
+    #         'stop sign',
+    #         'parking meter',
+    #         'bench',
+    #         'bird',
+    #         'cat',
+    #         'dog',
+    #         'horse',
+    #         'sheep',
+    #         'cow',
+    #         'elephant',
+    #         'bear',
+    #         'zebra',
+    #         'giraffe',
+    #         'backpack',
+    #         'umbrella',
+    #         'handbag',
+    #         'tie',
+    #         'suitcase',
+    #         'frisbee',
+    #         'skis',
+    #         'snowboard',
+    #         'sports ball',
+    #         'kite',
+    #         'baseball bat',
+    #         'baseball glove',
+    #         'skateboard',
+    #         'surfboard',
+    #         'tennis racket',
+    #         'bottle',
+    #         'wine glass',
+    #         'cup',
+    #         'fork',
+    #         'knife',
+    #         'spoon',
+    #         'bowl',
+    #         'banana',
+    #         'apple',
+    #         'sandwich',
+    #         'orange',
+    #         'broccoli',
+    #         'carrot',
+    #         'hot dog',
+    #         'pizza',
+    #         'donut',
+    #         'cake',
+    #         'chair',
+    #         'couch',
+    #         'potted plant',
+    #         'bed',
+    #         'dining table',
+    #         'toilet',
+    #         'tv',
+    #         'laptop',
+    #         'mouse',
+    #         'remote',
+    #         'keyboard',
+    #         'cell phone',
+    #         'microwave',
+    #         'oven',
+    #         'toaster',
+    #         'sink',
+    #         'refrigerator',
+    #         'book',
+    #         'clock',
+    #         'vase',
+    #         'scissors',
+    #         'teddy bear',
+    #         'hair drier',
+    #         'toothbrush'
+    #     )
     for i, data in enumerate(loader):
         images, boxes, labels = data
+        # images, boxes, labels,imagePath = data
+
         images = images.to(device)
+        
         boxes = boxes.to(device)
         labels = labels.to(device)
         optimizer.zero_grad()
         confidence, locations = net(images)
         
-        
+        # prob_threshold = 0.45
+        # for x in range(16):
+        #     picked_box_probs = []
+        #     picked_labels = []
+        #     scores = confidence[x]
+        #     # box_es = locations[x]
+        #     box_es = boxes[x]
+        #     _, width, height = images[x].shape
+        #     orig_image = cv2.imread("D:\MachineLearning\dataForPytorch-ssd\data\\fruit\\train\\"+imagePath[x]+".jpg")
+        #     for class_index in range(1, scores.size(1)):
+        #         probs = scores[:, class_index]
+        #         mask = probs > prob_threshold
+        #         probs = probs[mask]
+        #         if probs.size(0) == 0:
+        #             continue
+        #         subset_boxes = box_es[mask, :]
+                
+        #         box_probs = torch.cat([subset_boxes, probs.reshape(-1, 1)], dim=1)
+        #         box_probs = box_utils.nms(box_probs, None,
+        #                                 score_threshold=0.4,
+        #                                 iou_threshold=0.45,
+        #                                 sigma=0.5,
+        #                                 top_k=10,
+        #                                 candidate_size=200)
+        #         # box_probs has 4 boxes and 1 acc, so it cause error
+                
+        #         picked_box_probs.append(box_probs)
+        #         picked_labels.extend([class_index] * box_probs.size(0))
+        #     if not picked_box_probs:
+        #         continue
+        #     picked_box_probs = torch.cat(picked_box_probs)
+        #     picked_box_probs[:, 0] *= width
+        #     picked_box_probs[:, 1] *= height
+        #     picked_box_probs[:, 2] *= width
+        #     picked_box_probs[:, 3] *= height
+        #     outputBox,outputLabel,pro = picked_box_probs[:, :4], torch.tensor(picked_labels), picked_box_probs[:, 4]
+        #     for i in range(outputBox.size(0)):
+        #         box = outputBox[i, : ]
+        #         cv2.rectangle(orig_image, (int(box[0].item()), int(box[1].item())), (int(box[2].item()), int(box[3].item())), (255, 255, 0), 4)
+        #         #label = f"""{voc_dataset.class_names[labels[i]]}: {probs[i]:.2f}"""
+        #         label = f"{class_names[outputLabel[i]]}: {pro[i]:.2f}"
+        #         cv2.putText(orig_image, label,
+        #                     (int(box[0].item()) + 20, int(box[1].item()) + 40),
+        #                     cv2.FONT_HERSHEY_SIMPLEX,
+        #                     1,  # font scale
+        #                     (255, 0, 255),
+        #                     2)  # line type
+        #     path = "run_ssd_example_output"+str(x)+".jpg"
+        #     cv2.imwrite(path, orig_image)
+        # sys.exit(0)
         regression_loss, classification_loss = criterion(confidence, locations, labels, boxes)  # TODO CHANGE BOXES
         loss = regression_loss + classification_loss
         loss.backward()
@@ -244,7 +384,9 @@ if __name__ == '__main__':
             num_classes = len(dataset.class_names)
         elif args.dataset_type == "coco":
             # label_file = "D:\MachineLearning\pytorch\pytorch-ssd\data\COCO\ms_coco_classnames.txt"
-            dataset = COCODataSet("/home/ec2-user/SageMaker/Zhenyu Lin/COCO/train/train2017", "/home/ec2-user/SageMaker/Zhenyu Lin/COCO/anns/annotations/instances_train2017.json",transform=train_transform,
+            # dataset = COCODataSet("/home/ec2-user/SageMaker/Zhenyu Lin/COCO/train/train2017", "/home/ec2-user/SageMaker/Zhenyu Lin/COCO/anns/annotations/instances_train2017.json",transform=train_transform,
+            #                      target_transform=target_transform)
+            dataset = COCODataSet("D:\MachineLearning\pytorch\pytorch-ssd\data\COCO\\train", "D:\MachineLearning\pytorch\pytorch-ssd\data\COCO\\annotations\instances_train2017.json",transform=train_transform,
                                  target_transform=target_transform)
             num_classes = 91
         else:
@@ -255,11 +397,11 @@ if __name__ == '__main__':
     # logging.info(f"Stored labels into file {label_file}.")
     train_dataset = ConcatDataset(datasets)
     logging.info("Train dataset size: {}".format(len(train_dataset)))
-    train_loader = DataLoader(train_dataset, args.batch_size,
-                              num_workers=args.num_workers,
-                              shuffle=True)
     # train_loader = DataLoader(train_dataset, args.batch_size,
+    #                           num_workers=args.num_workers,
     #                           shuffle=True)
+    train_loader = DataLoader(train_dataset, args.batch_size,
+                              shuffle=True)
                               
                            
     # create validation dataset                           
@@ -273,16 +415,18 @@ if __name__ == '__main__':
                                         dataset_type="test")
         logging.info(val_dataset)
     elif args.dataset_type == "coco":
-        val_dataset = COCODataSet("/home/ec2-user/SageMaker/Zhenyu Lin/COCO/val/val2017", "/home/ec2-user/SageMaker/Zhenyu Lin/COCO/anns/annotations/instances_val2017.json",transform=test_transform,
+        # val_dataset = COCODataSet("/home/ec2-user/SageMaker/Zhenyu Lin/COCO/val/val2017", "/home/ec2-user/SageMaker/Zhenyu Lin/COCO/anns/annotations/instances_val2017.json",transform=test_transform,
+        #                          target_transform=target_transform)
+        val_dataset = COCODataSet("D:\MachineLearning\pytorch\pytorch-ssd\data\COCO\\val", "D:\MachineLearning\pytorch\pytorch-ssd\data\COCO\\annotations\instances_val2017.json",transform=test_transform,
                                  target_transform=target_transform)
         
     logging.info("Validation dataset size: {}".format(len(val_dataset)))
 
-    val_loader = DataLoader(val_dataset, args.batch_size,
-                            num_workers=args.num_workers,
-                            shuffle=False)
     # val_loader = DataLoader(val_dataset, args.batch_size,
+    #                         num_workers=args.num_workers,
     #                         shuffle=False)
+    val_loader = DataLoader(val_dataset, args.batch_size,
+                            shuffle=False)
                             
     # create the network
     logging.info("Build network.")
@@ -377,7 +521,6 @@ if __name__ == '__main__':
     logging.info(f"Start training from epoch {last_epoch + 1}.")
     
     for epoch in range(last_epoch + 1, args.num_epochs):
-        # test(val_loader, net, criterion, DEVICE)
         train(train_loader, net, criterion, optimizer,
               device=DEVICE, debug_steps=args.debug_steps, epoch=epoch)
         scheduler.step()
