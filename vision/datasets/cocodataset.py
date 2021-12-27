@@ -122,8 +122,9 @@ class COCODataSet:
         # for x in range(len(self.ids_ann)):
         
         # anns = self.coco.loadAnns(self.ids_ann[image_id])[0]
-        if (len(self.coco.getAnnIds(image_id)) == 0):
+        while (len(self.coco.getAnnIds(image_id)) == 0):
             image_id = self.ids[idx+1]
+            
         anns = self.coco.loadAnns(self.coco.getAnnIds(image_id))[0]
 
         tempBox = anns["bbox"]
